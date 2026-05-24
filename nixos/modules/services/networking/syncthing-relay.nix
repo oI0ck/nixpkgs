@@ -23,6 +23,10 @@ let
   ++ optional (cfg.perSessionRateBps != null) "--per-session-rate=${toString cfg.perSessionRateBps}"
   ++ optional (cfg.tokenFile != null) "--token=$(cat ${cfg.tokenFile})"
   ++ cfg.extraOptions;
+
+ wrapper = pkgs.writeShellScript "strelaysrv-wrapper" ''
+   ${pkgs.syncthing-relay}/bin/strelaysrv ${concatStringsSep " " relayOptions}
+ '';
 in
 {
   ###### interface
@@ -128,7 +132,7 @@ in
         StateDirectory = baseNameOf dataDirectory;
 
         Restart = "on-failure";
-        ExecStart = "${pkgs.syncthing-relay}/bin/strelaysrv ${concatStringsSep " " relayOptions}";
+        ExecStart = "${wrapper}";
       };
     };
   };
